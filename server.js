@@ -39,7 +39,29 @@ app.post('/api/signup', async(req,res)=>{
         const hasedPassword= await bcrypt.hash(password,10)
         const randomPic = generateRandomUser();
         const newUser=new User({
-            name,email,password:hasedPassword,avatar:randomPic.avatar,
+            name,email,password:hasedPassword,avatar:randomPic.avatar,role:'user',
+        })
+        await newUser.save()
+        res.status(200).json({message:'User created Successfully'})
+    }
+    catch(error){
+        console.log('error during signup',error)
+        res.status(500).json({message:'server error during signup'})
+
+    }
+})
+app.post('/api/admin/signup', async(req,res)=>{
+    try{
+        const {name,email,password}=req.body
+        const existingUser= await User.findOne({email})
+        console.log(existingUser)
+        if(existingUser){
+            return res.status(500).json({message:'Email allready in use'})
+        }
+        const hasedPassword= await bcrypt.hash(password,10)
+        const randomPic = generateRandomUser();
+        const newUser=new User({
+            name,email,password:hasedPassword,avatar:randomPic.avatar,role: 'admin',
         })
         await newUser.save()
         res.status(200).json({message:'User created Successfully'})
@@ -77,8 +99,37 @@ app.post('/api/signin', async(req,res)=>{
     }
 })
 
+app.put('/api/profile/update', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { name, password } = req.body;
 
-function authinticateToken(req,res,next){
+    const updateFields = {};
+    if (name) updateFields.name = name;
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateFields.password = hashedPassword;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
+      new: true,
+      select: '-password',
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ message: 'Profile updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ message: 'Server error while updating profile' });
+  }
+});
+
+
+
+function authenticateToken(req,res,next){
     const authHeaders=req.headers['authorization']
     const token = authHeaders && authHeaders.split(' ')[1]
     if(!token){
@@ -94,7 +145,7 @@ function authinticateToken(req,res,next){
         return  res.status(403).json({message:'Invalid or expired token'})
     }
 }
-app.get('/api/profile',authinticateToken, async(req,res)=>{
+app.get('/api/profile',authenticateToken, async(req,res)=>{
     try{
         const userId=req.user.userId
         const user=await User.findById(userId).select("-password")
