@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
   res.send('Working fine');
 });
 
-app.post('/api/signup', async(req,res)=>{
+app.post('/signup', async(req,res)=>{
     try{
         const {name,email,password}=req.body
         const existingUser= await User.findOne({email})
@@ -50,7 +50,7 @@ app.post('/api/signup', async(req,res)=>{
 
     }
 })
-app.post('/api/admin/signup', async(req,res)=>{
+app.post('/admin/signup', async(req,res)=>{
     try{
         const {name,email,password}=req.body
         const existingUser= await User.findOne({email})
@@ -74,7 +74,7 @@ app.post('/api/admin/signup', async(req,res)=>{
 })
 
 
-app.post('/api/signin', async(req,res)=>{
+app.post('/signin', async(req,res)=>{
     try{
         const {email,password}=req.body
         const user= await User.findOne({email})
@@ -99,7 +99,7 @@ app.post('/api/signin', async(req,res)=>{
     }
 })
 
-app.put('/api/profile/update', authenticateToken, async (req, res) => {
+app.put('/profile/update', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
     const { name, password } = req.body;
@@ -145,7 +145,7 @@ function authenticateToken(req,res,next){
         return  res.status(403).json({message:'Invalid or expired token'})
     }
 }
-app.get('/api/profile',authenticateToken, async(req,res)=>{
+app.get('/profile',authenticateToken, async(req,res)=>{
     try{
         const userId=req.user.userId
         const user=await User.findById(userId).select("-password")
