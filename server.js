@@ -16,7 +16,14 @@ const app=express();
 const port=3000;
 
 app.use(express.json())
-app.use(cors())
+const cors = require('cors');
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization','authorization'],
+}));
+app.options('*', cors());
+
 
 mongoose.connect(process.env.MONGODB_URL,{
     useNewUrlParser:true,
