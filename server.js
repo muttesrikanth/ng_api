@@ -87,7 +87,7 @@ app.post('/signin', async(req,res)=>{
             return  res.status(401).json({message:'Invalid email or password'})
         }
 
-        const token =jwt.sign({userId:user._id,email:user.email},process.env.SECRET_KEY,{expiresIn:'1h'})
+        const token =jwt.sign({userId:user._id,email:user.email},process.env.SECRET_KEY,{expiresIn:'24h'})
 
 
         res.json({token,user:{email:user.email}})
