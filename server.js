@@ -16,14 +16,7 @@ const app=express();
 const port=3000;
 
 app.use(express.json())
-const cors = require('cors');
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization','authorization'],
-}));
-app.options('*', cors());
-
+app.use(cors())
 
 mongoose.connect(process.env.MONGODB_URL,{
     useNewUrlParser:true,
@@ -31,8 +24,9 @@ mongoose.connect(process.env.MONGODB_URL,{
 }).then(()=>{console.log('connected to mongo Db......')}).catch((e)=>{console.log('Mongo connection error',e)})
 
 app.listen(port,()=>{console.log('Listning on port'+port)})
+
 app.get('/', (req, res) => {
-  res.send('Working fine');
+    res.send('Working fine');
 });
 
 app.post('/signup', async(req,res)=>{
